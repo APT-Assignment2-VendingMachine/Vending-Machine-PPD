@@ -99,7 +99,7 @@ void Purchase::purchase_room()
                                 s<<" "<<face_value[i]<<"c";
 
                             need_p+=face_value[i]; 
-                            //找零
+                            //change money
                             m_coin.change_coin(face_value[i]);
                         }
                     }
