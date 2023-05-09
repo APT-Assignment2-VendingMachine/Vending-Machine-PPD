@@ -1,18 +1,19 @@
 #ifndef PTRCHASE_H
 #define PTRCHASE_H
 #include "LinkedList.h"
-
+#include "Cin.h"
 class Purchase
 {
 private:
     LinkedList & m_lst;
-
-    //Get the amount entered by the user
-    std::string get_cin(bool a = true);
-
+    LinkedList & m_coin;
+    Cin & m_in;
+    Display &m_put;
 
 public:
-    Purchase(LinkedList & lst);
+    //获取用户输入的金额
+    std::string get_cin(bool a = true);
+    Purchase(LinkedList & lst,LinkedList & coin,Cin &in,Display &put);
 
     void purchase_room();
 
