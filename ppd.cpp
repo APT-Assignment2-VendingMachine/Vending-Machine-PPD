@@ -1,10 +1,41 @@
 #include <iostream>
 #include "Purchase.h"
+
+#include <limits>
+#include <cctype>
+#include <string>
+#include "LinkedList.h"
+#include "Purchase.h"
+#include "Display.h"
+#include "Coin.h"
+
+// Checks if price input is valid in that it matches the required format
+bool is_valid_price(const std::string &price_str) {
+    bool decimal_point_found = false;
+    int digits_after_decimal = 0;
+
+    for (const char &c : price_str) {
+        if (c == '.') {
+            if (decimal_point_found) return false;
+            decimal_point_found = true;
+        } else if (!std::isdigit(c)) {
+            return false;
+        } else if (decimal_point_found) {
+            ++digits_after_decimal;
+            if (digits_after_decimal > 2) return false;
+        }
+    }
+
+    return decimal_point_found && digits_after_decimal == 2;
+}
+
+
 /**
  * manages the running of the program, initialises data structures, loads
  * data, display the main menu, and handles the processing of options. 
  * Make sure free memory and close all files before exiting the program.
  **/
+
 int main(int argc, char **argv)
 {
     /* validate command line arguments */
@@ -35,9 +66,14 @@ int main(int argc, char **argv)
     stockList.loadStockData(StockFile);
     coinList.loadCoinsData(CoinsFile);  
 
+
     Cin m_cin(input_path,cin_or_path);
     Display display(output_path,cin_or_path);
     Purchase purchase(stockList,coinList,m_cin,display);
+
+    //Display display;
+    Coin coin;
+
 
     display.show_menu();
 
@@ -66,7 +102,49 @@ int main(int argc, char **argv)
         }
         else if(num == 4)
         {
+
+            // Enter paramters which the new item will be based off
+
+            std::cout << "You will now add a new stock item to the Vending Machine:\n";
+
+            std::string new_id = "I0006";
+            std::string name, desc;
+            double price = 0.0;
+            int onHand = 10;
+
+            std::cout << "The id of the new item will be: " << new_id << "\n";
+
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+            std::cout << "Enter the item name: ";
+            std::getline(std::cin, name);
+
+            std::cout << "Enter the item description: ";
+            std::getline(std::cin, desc);
+
+            while (true) {
+                std::cout << "Enter item price (in the format x.yy): ";
+                std::string price_str;
+                std::getline(std::cin, price_str);
+                if (is_valid_price(price_str)) {
+                    price = std::stod(price_str);
+                    break;
+                } else {
+                    std::cout << "Invalid format. Please enter the price in the format x.yy.\n";
+                }
+            }
+
+            // Extract dollars and cents from the user-in5put price
+            int dollars = static_cast<int>(price);
+            int cents = static_cast<int>((price - dollars) * 100 + 0.5); // Add 0.5 for rounding
+
+            // Add the item to the linked list using the addStock function and user-input parameters
+            stockList.addStock(new_id, name, desc, dollars, cents, onHand);
             
+            std::cout << "This item: \""<< name << " - " << desc << "\" has now been added to the menu.";
+            display.show_menu();
+
+
         }
         else if(num == 5)
         {
@@ -97,10 +175,14 @@ int main(int argc, char **argv)
 
             Node* current = coinList.getHead();
             while (current != NULL) {
-            Coin* coin = current->data1;
-            coin->ResetCoins(coin);
-            //std::cout << stock->on_hand << std::endl;
-            current = current->next;
+
+                Coin* coin = new Coin(current->data1->denom, current->data1->count); 
+
+                //std::cout << "BEFORE Coint count: " << coin->count << " Coin denom: " << coin->denom <<std::endl;
+                coin->ResetCoins(coin);               
+                //std::cout << "AFTER Coint count: " << coin->count << " Coin denom: " << coin->denom <<std::endl;
+                current = current->next;
+
             }
             std::cout << "“All coins has been reset to the default level of " << DEFAULT_COIN_COUNT << "”" << std::endl;
             //display.show_menu();
