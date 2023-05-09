@@ -25,7 +25,7 @@ public:
     Coin get_coin(int cn);
     // Use money
     void use_coin(int cn);
-    //找零钱
+    //change money
     void change_coin(int cn);
 
     Denomination get_coin_enum(int cn);
